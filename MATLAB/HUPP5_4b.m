@@ -17,46 +17,45 @@ yvekt=xvekt;
 rmat=sqrt(xmat.^2+ymat.^2);
 
 % brytningsindexvariation i (x,y)-led
-n_core=1.51; % i kärnan
-n_clad=1.50; % i höljet
+n_core=1.51; % i kÃ¤rnan
+n_clad=1.50; % i hÃ¶ljet
 D_core=60e-6;
 
 % nmat=(rmat<=D_core/2)*n_core+(rmat>D_core/2)*n_clad;
 nmat = nmat_GRIN(n_core, n_clad, D_core, xmat, ymat);
 figure(1)
 imagesc(xvekt*1e6,yvekt*1e6,nmat)
-xlabel('x [µm]')
-ylabel('y [µm]')
+xlabel('x [Âµm]')
+ylabel('y [Âµm]')
 colormap(jet)
 colorbar
 title('Brytningsindexvariation')
 drawnow
 
 
-% dämpmatris (behöver normalt inte ändras)
-r_daemp_start=0.8*N/2*a; % ut till denna radie sker ingen dämpning
-kantvaerde=0.8; % värdet på daempmat vid kanten av beräkningsfönstret (längs xy-axlarna)
+% dÃ¤mpmatris (behÃ¶ver normalt inte Ã¤ndras)
+r_daemp_start=0.8*N/2*a; % ut till denna radie sker ingen dÃ¤mpning
+kantvaerde=0.8; % vÃ¤rdet pÃ¥ daempmat vid kanten av berÃ¤kningsfÃ¶nstret (lÃ¤ngs xy-axlarna)
 daempmat=(rmat<=r_daemp_start)*1+(rmat>r_daemp_start).*(1-(1-kantvaerde)/(N/2*a-r_daemp_start)^2.*(rmat-r_daemp_start).^2);
-% daempmat((abs(xmat) <= D_core/2) & (abs(ymat) <= D_core/2)) = 1;
-daempmat(daempmat<0)=0;
+daempmat((abs(xmat) <= D_core/2) & (abs(ymat) <= D_core/2)) = 1;
 
 figure(2)
 mesh(xvekt*1e6,yvekt*1e6,daempmat)
-xlabel('x [µm]')
-ylabel('y [µm]')
+xlabel('x [Âµm]')
+ylabel('y [Âµm]')
 title('Daempmat')
 colormap(jet)
 drawnow
-disp('Tryck valfri tangent för att fortsätta!')
+disp('Tryck valfri tangent fÃ¶r att fortsÃ¤tta!')
 pause
 
-% startfält "längst till vänster"
+% startfÃ¤lt "lÃ¤ngst till vÃ¤nster"
 delta_x = 10e-6;
 alpha = 4/360*2*pi; 
 constant = exp(1i*k_noll*sin(alpha).*ymat);
 E_start= constant.*exp(-((xmat-delta_x).^2+ymat.^2)/omega_in^2);
 
-% total propagationssträcka och BPM-steg-storlek
+% total propagationsstrÃ¤cka och BPM-steg-storlek
 L=3*1000e-6;
 delta_z=2e-6;
 Lvekt=delta_z:delta_z:L;
@@ -68,27 +67,27 @@ steg_nummer=0;
 for akt_L=Lvekt
     steg_nummer=steg_nummer+1;
     
-    E2=BPM_steg(E1,delta_z,N,a,lambda_noll,nmat,daempmat); % Fältfördelning i Plan 2
+    E2=BPM_steg(E1,delta_z,N,a,lambda_noll,nmat,daempmat); % FÃ¤ltfÃ¶rdelning i Plan 2
     
-    I2=abs(E2).^2; % Intensitetsfördelning i Plan 2
+    I2=abs(E2).^2; % IntensitetsfÃ¶rdelning i Plan 2
     
-    % Vektorer/matriser för plottning sett "från sidan"
+    % Vektorer/matriser fÃ¶r plottning sett "frÃ¥n sidan"
     E2_laengs_yaxeln=E2(:,N/2+1);
     E_sida(:,steg_nummer)=E2_laengs_yaxeln;
     I2_laengs_yaxeln=abs(E2_laengs_yaxeln).^2;
     I2_laengs_yaxeln_norm=I2_laengs_yaxeln/max(I2_laengs_yaxeln);
     I_sida_norm(:,steg_nummer)=I2_laengs_yaxeln_norm;
     
-    if steg_nummer <50 | rem(steg_nummer,5)==0 % för att snabba på simuleringen plottas inte alla BPM-steg
+    if steg_nummer <50 | rem(steg_nummer,5)==0 % fÃ¶r att snabba pÃ¥ simuleringen plottas inte alla BPM-steg
         
         figure(10)
         imagesc(xvekt*1e6,yvekt*1e6,I2)
         hold on
         plot(D_core/2*cos(linspace(0,2*pi,50))*1e6,D_core/2*sin(linspace(0,2*pi,50))*1e6,'Color',[1 1 1]*0.6,'LineWidth',2)
-        title(['Intensitet i tvärsnitt efter ' num2str(akt_L*1e3) ' mm propagation' ])
+        title(['Intensitet i tvÃ¤rsnitt efter ' num2str(akt_L*1e3) ' mm propagation' ])
         axis('square')
-        xlabel('x [µm]')
-        ylabel('y [µm]')
+        xlabel('x [Âµm]')
+        ylabel('y [Âµm]')
         colormap(jet)
         hold off
         drawnow
@@ -99,7 +98,7 @@ for akt_L=Lvekt
         imagesc(Lvekt*1e3,yvekt*1e6,I_sida_norm)
         title(['I_-sida: Normerad intensitet efter ' num2str(akt_L*1e3) ' mm propagation' ])
         xlabel('z [mm]')
-        ylabel('y [µm]')
+        ylabel('y [Âµm]')
         colormap(jet)
         drawnow
         %pause
